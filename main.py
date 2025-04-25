@@ -8,7 +8,7 @@ from aiohttp import ClientSession, ClientTimeout, TCPConnector
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-st.title("🚀 Optimized API Tester & Analyzer (Legendary Edition)")
+st.title("🚀 API Tester & Analyzer ")
 
 # Inputs
 api_url = st.text_input("Enter API URL:")
