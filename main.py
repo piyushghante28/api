@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
 
-st.title("🚀  API Tester & Analyzer ")
+st.title("🚀 API Tester & Analyzer")
 
 # Inputs
 api_url = st.text_input("Enter API URL:")
@@ -41,7 +41,7 @@ async def fetch(session: ClientSession, i: int, url: str, headers: dict):
         }
 
 # Function to execute multiple API calls concurrently
-async def run_api_calls(api_url, headers, times, max_concurrent_requests):
+async def run_api_calls(api_url, headers, times, max_concurrent_requests, timeout_seconds):
     async with ClientSession(connector=TCPConnector(limit_per_host=max_concurrent_requests),
                              timeout=ClientTimeout(total=timeout_seconds)) as session:
         tasks = [fetch(session, i, api_url, headers) for i in range(times)]
@@ -55,8 +55,10 @@ if st.button("🚀 Run Optimized API Test"):
         headers = {"Authorization": f"Bearer {token}"}
         st.info("Running requests...")
 
-        # Run the concurrent requests using asyncio.run()
-        results = asyncio.run(run_api_calls(api_url, headers, times, max_concurrent_requests))
+        # Run the concurrent requests using asyncio event loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        results = loop.run_until_complete(run_api_calls(api_url, headers, times, max_concurrent_requests, timeout_seconds))
 
         # Convert to DataFrame for analysis
         df = pd.DataFrame(results).sort_values(by="Call #")
@@ -83,7 +85,7 @@ if st.button("🚀 Run Optimized API Test"):
         st.pyplot()
 
         # Throughput: Requests per second
-        throughput = times / (df["Time (s)"].sum() / 1000)  # RPS = total requests / total time in seconds
+        throughput = times / df["Time (s)"].sum()
         st.subheader(f"💥 Throughput (Requests Per Second): {throughput:.2f} RPS")
 
         # Downloadable Report
