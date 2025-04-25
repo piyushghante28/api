@@ -1,14 +1,12 @@
 import streamlit as st
 import aiohttp
 import asyncio
-import pandas as pd
 import time
+import pandas as pd
 import matplotlib.pyplot as plt
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
-from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
 
-st.title("🚀 API Tester & Analyzer ")
+st.title("🚀  API Tester & Analyzer ")
 
 # Inputs
 api_url = st.text_input("Enter API URL:")
@@ -57,9 +55,8 @@ if st.button("🚀 Run Optimized API Test"):
         headers = {"Authorization": f"Bearer {token}"}
         st.info("Running requests...")
 
-        # Run the concurrent requests
-        loop = asyncio.get_event_loop()
-        results = loop.run_until_complete(run_api_calls(api_url, headers, times, max_concurrent_requests))
+        # Run the concurrent requests using asyncio.run()
+        results = asyncio.run(run_api_calls(api_url, headers, times, max_concurrent_requests))
 
         # Convert to DataFrame for analysis
         df = pd.DataFrame(results).sort_values(by="Call #")
