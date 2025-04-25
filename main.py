@@ -17,14 +17,6 @@ times = st.number_input("How many times to hit the API?", min_value=1, max_value
 max_concurrent_requests = st.slider("Max Concurrent Requests", min_value=1, max_value=50, value=20)
 timeout_seconds = st.slider("Timeout (seconds)", min_value=1, max_value=30, value=10)
 
-# Optional: SSL Context (for debugging SSL issues)
-ssl_context = None
-if st.checkbox("Disable SSL Verification (Debug Only)"):
-    import ssl
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-
 # Function to handle API calls
 async def fetch(session: ClientSession, i: int, url: str, headers: dict):
     start_time = time.time()
@@ -50,10 +42,8 @@ async def fetch(session: ClientSession, i: int, url: str, headers: dict):
 
 # Function to execute multiple API calls concurrently
 async def run_api_calls(api_url, headers, times, max_concurrent_requests, timeout_seconds):
-    async with ClientSession(
-        connector=TCPConnector(limit_per_host=max_concurrent_requests, ssl=ssl_context),
-        timeout=ClientTimeout(total=timeout_seconds)
-    ) as session:
+    async with ClientSession(connector=TCPConnector(limit_per_host=max_concurrent_requests),
+                             timeout=ClientTimeout(total=timeout_seconds)) as session:
         tasks = [fetch(session, i, api_url, headers) for i in range(times)]
         return await asyncio.gather(*tasks)
 
@@ -95,8 +85,7 @@ if st.button("🚀 Run Optimized API Test"):
         st.pyplot()
 
         # Throughput: Requests per second
-        total_time = df["Time (s)"].sum() or 1  # Avoid division by zero
-        throughput = times / total_time
+        throughput = times / df["Time (s)"].sum()
         st.subheader(f"💥 Throughput (Requests Per Second): {throughput:.2f} RPS")
 
         # Downloadable Report
