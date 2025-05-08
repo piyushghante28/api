@@ -12,7 +12,7 @@ st.title("🚀 API Tester & Analyzer - Ultimate Edition")
 
 # 📥 Inputs
 api_url = st.text_input("Enter API URL:")
-method = st.selectbox("HTTP Method", ["GET", "POST"])
+method = st.selectbox("HTTP Method", ["GET", "POST"]) 
 token = st.text_input("Enter Bearer Token (Optional):", type="password")
 req_body = ""
 if method == "POST":
